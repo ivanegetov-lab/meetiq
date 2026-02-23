@@ -1,13 +1,13 @@
 import React from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Alert, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Alert, Pressable, Text, View, useWindowDimensions } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from 'expo-sharing';
 import ViewShot from 'react-native-view-shot';
+import { Ionicons } from '@expo/vector-icons';
 
 import ShareCardTemplate from '@/components/ShareCardTemplate';
-import { type Currency } from '@/lib/calculations';
+import { type Currency, type Recurrence } from '@/lib/calculations';
 import { type Severity } from '@/lib/risk';
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -30,6 +30,7 @@ export default function ShareScreen() {
     score?: string;
     severity?: Severity;
     risk?: string;
+    recurrence?: Recurrence;
   }>();
 
   const toNumber = (value: string | undefined, fallback: number) => {
@@ -47,6 +48,8 @@ export default function ShareScreen() {
     params.severity === 'severe' || params.severity === 'mid' || params.severity === 'good'
       ? params.severity
       : 'mid';
+  const recurrence: Recurrence =
+    params.recurrence === 'weekly' || params.recurrence === 'monthly' ? params.recurrence : 'one-time';
 
   const onShareImage = async () => {
     setShareMessage(null);
@@ -86,7 +89,6 @@ export default function ShareScreen() {
         return;
       }
 
-      // First save an asset to the library, then try to place it in a dedicated album.
       const asset = await MediaLibrary.createAssetAsync(uri);
       const albumName = 'MeetIQ';
 
@@ -99,7 +101,6 @@ export default function ShareScreen() {
         }
         Alert.alert('Saved', 'Saved to your gallery (MeetIQ album).');
       } catch {
-        // Album assignment can fail on some Android configurations; keep the successful library save.
         Alert.alert('Saved', 'Saved to your gallery.');
       }
     } catch {
@@ -126,8 +127,8 @@ export default function ShareScreen() {
   } as any;
 
   return (
-    <SafeAreaView className="flex-1 bg-zinc-950">
-      <ScrollView className="flex-1 px-6" contentContainerClassName="pt-6" contentContainerStyle={{ paddingBottom: 120 }}>
+    <View className="flex-1 bg-white">
+      <View className="flex-1 px-6 pt-6" style={{ paddingBottom: 80 }}>
         <View style={{ width: 1080 * scale, height: 1080 * scale, alignSelf: 'center' }}>
           <View style={previewInnerStyle}>
             <ShareCardTemplate
@@ -138,13 +139,14 @@ export default function ShareScreen() {
               score={score}
               severity={severity}
               risk={risk}
+              recurrence={recurrence}
             />
           </View>
         </View>
 
-        <Text className="mt-5 text-center text-sm text-zinc-400">Take a screenshot to share on LinkedIn</Text>
-        {shareMessage ? <Text className="mt-2 text-center text-xs leading-5 text-zinc-500">{shareMessage}</Text> : null}
-      </ScrollView>
+        <Text className="mt-5 text-center text-sm text-gray-500">Take a screenshot to share on LinkedIn</Text>
+        {shareMessage ? <Text className="mt-2 text-center text-xs leading-5 text-gray-400">{shareMessage}</Text> : null}
+      </View>
 
       <View style={{ position: 'absolute', left: -2000, top: 0 }}>
         <ViewShot
@@ -159,27 +161,33 @@ export default function ShareScreen() {
             score={score}
             severity={severity}
             risk={risk}
+            recurrence={recurrence}
           />
         </ViewShot>
       </View>
 
-      <View className="border-t border-zinc-800 bg-zinc-950 px-6 pb-6 pt-4">
-        <Pressable onPress={onShareImage} className="rounded-2xl bg-white px-5 py-4">
-          <Text className="text-center text-base font-bold text-zinc-950">Share Image</Text>
-        </Pressable>
+      <View className="border-t border-gray-200 bg-white px-6 pb-4 pt-3">
+        <View className="flex-row items-center justify-center gap-4">
+          <Pressable onPress={onShareImage} className="flex-1 items-center rounded-2xl bg-gray-900 px-4 py-3">
+            <Ionicons name="share-social-outline" size={22} color="#ffffff" />
+            <Text className="mt-1 text-xs font-semibold text-white">Share</Text>
+          </Pressable>
 
-        <Pressable onPress={onSaveImage} className="mt-3 rounded-2xl border border-zinc-700 px-5 py-4">
-          <Text className="text-center text-base font-semibold text-zinc-200">Save Image</Text>
-        </Pressable>
+          <Pressable onPress={onSaveImage} className="flex-1 items-center rounded-2xl border border-gray-300 px-4 py-3">
+            <Ionicons name="download-outline" size={22} color="#374151" />
+            <Text className="mt-1 text-xs font-semibold text-gray-700">Save</Text>
+          </Pressable>
 
-        <Pressable onPress={() => router.push('/results')} className="rounded-2xl border border-zinc-700 px-5 py-4">
-          <Text className="text-center text-base font-semibold text-zinc-200">Back to Results</Text>
-        </Pressable>
+          <Pressable onPress={() => router.back()} className="flex-1 items-center rounded-2xl border border-gray-300 px-4 py-3">
+            <Ionicons name="arrow-back-outline" size={22} color="#374151" />
+            <Text className="mt-1 text-xs font-semibold text-gray-700">Back</Text>
+          </Pressable>
+        </View>
 
-        <Pressable onPress={() => router.push('/calculate')} className="mt-3 rounded-2xl bg-white px-5 py-4">
-          <Text className="text-center text-base font-bold text-zinc-950">New Calculation</Text>
+        <Pressable onPress={() => router.navigate('/(tabs)/calculate' as never)} className="mt-2 px-5 py-2">
+          <Text className="text-center text-sm font-semibold text-gray-500">New Calculation</Text>
         </Pressable>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }

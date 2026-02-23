@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 
 import ShareRiskBand from '@/components/ShareRiskBand';
-import { formatMoney, type Currency } from '@/lib/calculations';
+import { formatMoney, type Currency, type Recurrence } from '@/lib/calculations';
 import { type Severity } from '@/lib/risk';
 
 type ShareCardTemplateProps = {
@@ -13,6 +13,7 @@ type ShareCardTemplateProps = {
   score: number;
   severity: Severity;
   risk: number;
+  recurrence?: Recurrence;
 };
 
 export default function ShareCardTemplate({
@@ -23,76 +24,116 @@ export default function ShareCardTemplate({
   score,
   severity,
   risk,
+  recurrence,
 }: ShareCardTemplateProps) {
+  const wasteColor =
+    severity === 'good' ? '#34d399' : severity === 'mid' ? '#fcd34d' : '#f87171';
+
+  const recurrenceLabel =
+    recurrence === 'weekly' ? 'Weekly meeting' : recurrence === 'monthly' ? 'Monthly meeting' : 'One-time meeting';
+
   return (
     <View
       style={{ width: 1080, height: 1080, borderRadius: 48, overflow: 'hidden' }}
       className="border border-zinc-800 bg-zinc-950">
-      <View className="h-full p-16">
-        <View className="gap-10">
-          <View>
-            <Text style={{ fontSize: 28, lineHeight: 34 }} className="font-semibold uppercase tracking-[6px] text-zinc-400">
-              MeetIQ
-            </Text>
-            <Text style={{ fontSize: 56, lineHeight: 64 }} className="mt-3 font-semibold text-zinc-100">
-              Meeting Cost Impact
-            </Text>
-          </View>
+      <View style={{ flex: 1, padding: 72, justifyContent: 'space-between' }}>
+        {/* Header: MEETIQ branding + subtitle */}
+        <View>
+          <Text
+            style={{ fontSize: 28, lineHeight: 34, letterSpacing: 6 }}
+            className="font-semibold uppercase text-zinc-400">
+            MeetIQ
+          </Text>
+          <Text
+            style={{ fontSize: 44, lineHeight: 52, marginTop: 8 }}
+            className="font-bold text-zinc-200">
+            Meeting Cost Impact
+          </Text>
+        </View>
 
-          <View>
-            <Text style={{ fontSize: 34, lineHeight: 38 }} className="uppercase tracking-wide text-zinc-400">
-              ANNUALIZED COST
+        {/* Hero: Annualized Cost */}
+        <View>
+          <Text
+            style={{ fontSize: 28, lineHeight: 34, letterSpacing: 4 }}
+            className="font-semibold uppercase text-zinc-500">
+            Annualized Cost
+          </Text>
+          <Text
+            style={{ fontSize: 136, lineHeight: 148, marginTop: 12 }}
+            className="font-extrabold text-white">
+            {formatMoney(annualizedCost, currency)}
+          </Text>
+        </View>
+
+        {/* Stat Cards Row */}
+        <View style={{ flexDirection: 'row', gap: 24 }}>
+          <View
+            style={{ flex: 1, borderRadius: 24, padding: 28 }}
+            className="border border-zinc-800 bg-zinc-900">
+            <Text
+              style={{ fontSize: 22, lineHeight: 28, letterSpacing: 2 }}
+              className="font-semibold uppercase text-zinc-500">
+              Cost / Meeting
             </Text>
             <Text
-              className="mt-4 font-extrabold text-white"
-              style={{ fontSize: 146, lineHeight: 150 }}>
-              {formatMoney(annualizedCost, currency)}
-            </Text>
-            <Text style={{ fontSize: 28, lineHeight: 34 }} className="mt-2 text-zinc-400">
-              Per year based on recurrence
+              style={{ fontSize: 44, lineHeight: 52, marginTop: 12 }}
+              className="font-extrabold text-white">
+              {formatMoney(costPerMeeting, currency)}
             </Text>
           </View>
 
-          <View className="flex-row gap-5">
-            <View className="flex-1 rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-              <Text style={{ fontSize: 24, lineHeight: 30 }} className="uppercase tracking-wide text-zinc-500">
-                Cost / meeting
-              </Text>
-              <Text style={{ fontSize: 48, lineHeight: 54 }} className="mt-2 font-bold text-zinc-100">
-                {formatMoney(costPerMeeting, currency)}
-              </Text>
-            </View>
-            <View className="flex-1 rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-              <Text style={{ fontSize: 24, lineHeight: 30 }} className="uppercase tracking-wide text-zinc-500">
-                Quality Score
-              </Text>
-              <Text style={{ fontSize: 48, lineHeight: 54 }} className="mt-2 font-bold text-zinc-100">
-                {Math.round(score)}/100
-              </Text>
-            </View>
-          </View>
-
-          <View>
-            <Text style={{ fontSize: 34, lineHeight: 38 }} className="uppercase tracking-wide text-zinc-400">
-              ESTIMATED ANNUALIZED WASTE
+          <View
+            style={{ flex: 1, borderRadius: 24, padding: 28 }}
+            className="border border-zinc-800 bg-zinc-900">
+            <Text
+              style={{ fontSize: 22, lineHeight: 28, letterSpacing: 2 }}
+              className="font-semibold uppercase text-zinc-500">
+              Quality Score
             </Text>
             <Text
-              style={{ fontSize: 86, lineHeight: 92 }}
-              className={`mt-4 font-extrabold ${
-                severity === 'good' ? 'text-emerald-400' : severity === 'mid' ? 'text-amber-300' : 'text-red-400'
-              }`}>
-              {formatMoney(annualizedWaste, currency)}
+              style={{ fontSize: 44, lineHeight: 52, marginTop: 12 }}
+              className="font-extrabold text-white">
+              {Math.round(score)}/100
             </Text>
           </View>
+        </View>
 
-          <View className="gap-6">
-            <Text style={{ fontSize: 34, lineHeight: 38 }} className="text-zinc-300 font-semibold tracking-wide uppercase">
-              MEETING WASTE RISK
-            </Text>
-            <View style={{ height: 84, justifyContent: 'center', overflow: 'hidden' }}>
-              <ShareRiskBand risk={risk} severity={severity} />
-            </View>
-          </View>
+        {/* Waste */}
+        <View>
+          <Text
+            style={{ fontSize: 28, lineHeight: 34, letterSpacing: 4 }}
+            className="font-semibold uppercase text-zinc-500">
+            Est. Annualized Waste
+          </Text>
+          <Text
+            style={{ fontSize: 80, lineHeight: 92, marginTop: 12 }}
+            className="font-extrabold">
+            <Text style={{ color: wasteColor }}>{formatMoney(annualizedWaste, currency)}</Text>
+          </Text>
+        </View>
+
+        {/* Risk Band */}
+        <View>
+          <Text
+            style={{ fontSize: 24, lineHeight: 30, letterSpacing: 3, marginBottom: 16 }}
+            className="font-semibold uppercase text-zinc-500">
+            Meeting Waste Risk
+          </Text>
+          <ShareRiskBand risk={risk} severity={severity} />
+        </View>
+
+        {/* Footer */}
+        <View className="flex-row items-center justify-between">
+          <Text
+            style={{ fontSize: 26, lineHeight: 32 }}
+            className="text-zinc-500">
+            {recurrenceLabel}
+          </Text>
+          <Text
+            style={{ fontSize: 26, lineHeight: 32 }}
+            className="text-zinc-600">
+            meetiq.app
+          </Text>
         </View>
       </View>
     </View>

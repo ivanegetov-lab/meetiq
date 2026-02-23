@@ -31,15 +31,15 @@ export default function RiskBand({
 
   const riskText = severity === 'good' ? 'Low risk' : severity === 'mid' ? 'Medium risk' : 'High risk';
   const riskTextColor =
-    severity === 'good' ? 'text-emerald-400' : severity === 'mid' ? 'text-amber-300' : 'text-red-400';
+    severity === 'good' ? 'text-emerald-600' : severity === 'mid' ? 'text-amber-600' : 'text-red-600';
 
   const containerClass = compact
-    ? 'rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-3'
-    : 'mt-6 rounded-2xl border border-zinc-800 bg-zinc-900 p-4';
-  const barClass = compact ? 'h-3 flex-row overflow-hidden rounded-full border border-zinc-700' : 'h-4 flex-row overflow-hidden rounded-full border border-zinc-700';
+    ? 'rounded-xl border border-gray-200 bg-white px-3 py-3'
+    : 'mt-6 rounded-2xl border border-gray-200 bg-white p-4';
+  const barClass = compact ? 'h-3 flex-row overflow-hidden rounded-full border border-gray-300' : 'h-4 flex-row overflow-hidden rounded-full border border-gray-300';
   const titleClass = compact
-    ? 'text-xs font-semibold uppercase tracking-wide text-zinc-400'
-    : 'text-sm font-semibold uppercase tracking-wide text-zinc-400';
+    ? 'text-xs font-semibold uppercase tracking-wide text-gray-500'
+    : 'text-sm font-semibold uppercase tracking-wide text-gray-500';
   const badgeClass = compact ? `text-xs font-bold ${riskTextColor}` : `text-sm font-bold ${riskTextColor}`;
 
   return (
@@ -61,12 +61,21 @@ export default function RiskBand({
             </View>
             {barWidth > 0 ? (
               <View
-                className="absolute rounded-full border-2 border-zinc-900 bg-white"
                 style={{
+                  position: 'absolute',
                   width: markerSize,
                   height: markerSize,
                   left: markerLeft,
                   top: markerTop,
+                  borderRadius: markerSize / 2,
+                  backgroundColor: '#ffffff',
+                  borderWidth: 2,
+                  borderColor: '#374151',
+                  shadowColor: '#000000',
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 2,
+                  elevation: 3,
                 }}
               />
             ) : null}
@@ -89,23 +98,32 @@ export default function RiskBand({
             </View>
             {barWidth > 0 ? (
               <View
-                className="absolute rounded-full border-2 border-zinc-900 bg-white"
                 style={{
+                  position: 'absolute',
                   width: markerSize,
                   height: markerSize,
                   left: markerLeft,
                   top: markerTop,
+                  borderRadius: markerSize / 2,
+                  backgroundColor: '#ffffff',
+                  borderWidth: 2,
+                  borderColor: '#374151',
+                  shadowColor: '#000000',
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 2,
+                  elevation: 3,
                 }}
               />
             ) : null}
           </View>
 
           <View className="mt-2 flex-row justify-between px-1">
-            <Text className="text-xs text-zinc-400">Low</Text>
-            <Text className="text-xs text-zinc-400">Medium</Text>
-            <Text className="text-xs text-zinc-400">High</Text>
+            <Text className="text-xs text-gray-400">Low</Text>
+            <Text className="text-xs text-gray-400">Medium</Text>
+            <Text className="text-xs text-gray-400">High</Text>
           </View>
-          <Text className="mt-2 text-xs text-zinc-500">Position within zone reflects annualized waste.</Text>
+          <Text className="mt-2 text-xs text-gray-400">Position within zone reflects annualized waste.</Text>
         </>
       )}
     </View>
